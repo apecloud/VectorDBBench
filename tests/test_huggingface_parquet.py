@@ -108,7 +108,8 @@ def test_hugging_face_parquet_manager_resolves_roles_and_concatenates_queries(
 
     assert manager.prepare(k=2)
     assert manager.train_files == ["train/part-0.parquet", "train/part-1.parquet"]
-    assert manager.test_data == [[10.0, 10.0], [11.0, 11.0], [12.0, 12.0]]
+    assert manager.test_data.dtype.name == "float32"
+    assert manager.test_data.tolist() == [[10.0, 10.0], [11.0, 11.0], [12.0, 12.0]]
     assert [row.tolist() for row in manager.gt_data.iter_rows()] == [[0, 1], [1, 2], [2, 3]]
     assert [item for batch in manager.iter_batches(2) for item in batch["id"].tolist()] == [0, 1, 2, 3]
     assert manager.result_metadata["train_files"] == manager.train_files

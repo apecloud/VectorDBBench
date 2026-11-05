@@ -60,9 +60,8 @@ class ReadWriteRunner(MultiProcessingSearchRunner, RatedMultiThreadingInsertRunn
         )
 
         if normalize:
-            test_emb = np.array(dataset.test_data)
+            test_emb = np.asarray(dataset.test_data, dtype=np.float32)
             test_emb = test_emb / np.linalg.norm(test_emb, axis=1)[:, np.newaxis]
-            test_emb = test_emb.tolist()
         else:
             test_emb = dataset.test_data
 

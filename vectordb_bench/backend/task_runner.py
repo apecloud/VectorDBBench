@@ -60,7 +60,7 @@ class CaseRunner(BaseModel):
     dataset_source: DatasetSource
 
     db: api.VectorDB | None = None
-    test_emb: list[list[float]] | None = None
+    test_emb: np.ndarray | list[list[float]] | None = None
     test_texts: list[str] | None = None
     serial_search_runner: SerialSearchRunner | None = None
     search_runner: MultiProcessingSearchRunner | None = None
@@ -530,9 +530,9 @@ class CaseRunner(BaseModel):
 
     def _init_cold_warm_search_runner(self) -> None:
         if self.normalize:
-            test_emb = np.stack(self.ca.dataset.test_data)
+            test_emb = np.asarray(self.ca.dataset.test_data, dtype=np.float32)
             test_emb = test_emb / np.linalg.norm(test_emb, axis=1)[:, np.newaxis]
-            self.test_emb = test_emb.tolist()
+            self.test_emb = test_emb
         else:
             self.test_emb = self.ca.dataset.test_data
 
@@ -676,9 +676,9 @@ class CaseRunner(BaseModel):
 
     def _init_search_runner(self):
         if self.normalize:
-            test_emb = np.stack(self.ca.dataset.test_data)
+            test_emb = np.asarray(self.ca.dataset.test_data, dtype=np.float32)
             test_emb = test_emb / np.linalg.norm(test_emb, axis=1)[:, np.newaxis]
-            self.test_emb = test_emb.tolist()
+            self.test_emb = test_emb
         else:
             self.test_emb = self.ca.dataset.test_data
 

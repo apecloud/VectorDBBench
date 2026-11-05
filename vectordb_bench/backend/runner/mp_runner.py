@@ -40,7 +40,7 @@ class MultiProcessingSearchRunner:
     def __init__(
         self,
         db: api.VectorDB,
-        test_data: list[list[float]],
+        test_data: np.ndarray | list[list[float]],
         k: int = config.K_DEFAULT,
         filters: Filter = non_filter,
         concurrencies: Iterable[int] = config.NUM_CONCURRENCY,
@@ -81,7 +81,11 @@ class MultiProcessingSearchRunner:
         self.duration = duration
         self.concurrency_timeout = concurrency_timeout
 
-        self.test_data = test_data
+        self.test_data = (
+            np.ascontiguousarray(test_data, dtype=np.float32)
+            if self.workload_kind == WorkloadKind.VECTOR
+            else test_data
+        )
         log.debug(f"test dataset columns: {len(test_data)}")
 
     def __getstate__(self):
@@ -126,15 +130,17 @@ class MultiProcessingSearchRunner:
             raise RuntimeError("Batch search must return one result list per query")
         return results
 
-    def _query_at(self, test_data: list, idx: int):
+    def _query_at(self, test_data: np.ndarray | list, idx: int):
         if self.nq == 1:
-            return test_data[idx]
+            query = test_data[idx]
+            return query.tolist() if isinstance(query, np.ndarray) else query
         # Wrap around to keep every throughput request at exactly nq vectors.
-        return [test_data[(idx + offset) % len(test_data)] for offset in range(self.nq)]
+        queries = [test_data[(idx + offset) % len(test_data)] for offset in range(self.nq)]
+        return [query.tolist() if isinstance(query, np.ndarray) else query for query in queries]
 
     def search(
         self,
-        test_data: list[list[float]],
+        test_data: np.ndarray | list[list[float]],
         q: mp.Queue,
         cond: mp.Condition,
     ) -> tuple[int, float]:
@@ -157,9 +163,10 @@ class MultiProcessingSearchRunner:
             count = 0
             latencies = []
             while time.perf_counter() < start_time + self.duration:
+                query = self._query_at(test_data, idx)
                 s = time.perf_counter()
                 try:
-                    self._search_once(self._query_at(test_data, idx), tenant_rng=tenant_rng)
+                    self._search_once(query, tenant_rng=tenant_rng)
                     count += self.nq
                     latencies.append(time.perf_counter() - s)
                 except Exception as e:
@@ -411,7 +418,7 @@ class MultiProcessingSearchRunner:
         )
 
     def search_by_dur(
-        self, dur: int, test_data: list[list[float]], q: mp.Queue, cond: mp.Condition
+        self, dur: int, test_data: np.ndarray | list[list[float]], q: mp.Queue, cond: mp.Condition
     ) -> tuple[int, int, dict]:
         """
         Returns:
@@ -435,9 +442,10 @@ class MultiProcessingSearchRunner:
             success_count = 0
             failed_cnt = 0
             while time.perf_counter() < start_time + dur:
+                query = self._query_at(test_data, idx)
                 s = time.perf_counter()
                 try:
-                    self._search_once(self._query_at(test_data, idx))
+                    self._search_once(query)
                     success_count += self.nq
                     latency_us = int((time.perf_counter() - s) * US_TO_SECONDS)
                     histogram.record_value(max(HDR_HISTOGRAM_MIN_US, min(latency_us, HDR_HISTOGRAM_MAX_US)))

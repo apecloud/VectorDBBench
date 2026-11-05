@@ -481,7 +481,7 @@ class DatasetManager(BaseModel, ABC):
     data: BaseDataset
     load_timeout: float | int = config.LOAD_TIMEOUT_DEFAULT
     optimize_timeout: float | int | None = config.OPTIMIZE_TIMEOUT_DEFAULT
-    test_data: list[list[float]] | None = None
+    test_data: np.ndarray | list[list[float]] | None = None
     gt_data: ParquetGroundTruth | list[list[int]] | None = None
     search_files: SearchDatasetFiles | None = None
     scalar_labels: pl.DataFrame | None = None
@@ -623,7 +623,11 @@ class ParquetDatasetManager(DatasetManager):
                 )
                 raise ValueError(msg)
             query_ids = test_frame[self.data.test_id_field].to_list()
-            self.test_data = test_frame[self.data.test_vector_field].to_list()
+            # Keep queries packed; Python float lists cost about 8x as much per worker.
+            self.test_data = np.ascontiguousarray(
+                test_frame[self.data.test_vector_field].cast(pl.Array(pl.Float32, self.data.dim)).to_numpy(),
+                dtype=np.float32,
+            )
             self.gt_data = ParquetGroundTruth.from_file(
                 self._local_path(resolved_gt_file),
                 id_field=self.data.gt_id_field,

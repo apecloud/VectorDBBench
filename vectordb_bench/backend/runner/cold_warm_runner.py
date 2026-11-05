@@ -16,7 +16,7 @@ class ColdWarmSearchRunner:
     def __init__(
         self,
         db: api.VectorDB,
-        test_data: list[list[float]],
+        test_data: np.ndarray | list[list[float]],
         k: int = 100,
         filters: Filter = non_filter,
         payload_profile: PayloadProfile = PayloadProfile.IDS_ONLY,
@@ -38,9 +38,7 @@ class ColdWarmSearchRunner:
             msg = f"{self.db.name} does not support payload_profile={self.payload_profile.value}"
             raise NotImplementedError(msg)
 
-        self.test_data = [
-            query.tolist() if isinstance(query, np.ndarray) else query for query in test_data[:query_count]
-        ]
+        self.test_data = test_data[:query_count]
 
     def _search_embedding(self, emb: list[float]) -> list[int]:
         if self.payload_profile == PayloadProfile.IDS_ONLY:
@@ -89,6 +87,8 @@ class ColdWarmSearchRunner:
     def _run_pass(self, pass_name: str) -> dict[str, float]:
         latencies = []
         for emb in self.test_data:
+            if isinstance(emb, np.ndarray):
+                emb = emb.tolist()
             start = time.perf_counter()
             self._get_db_search_res(emb)
             latencies.append(time.perf_counter() - start)

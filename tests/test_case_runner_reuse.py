@@ -218,3 +218,31 @@ def test_search_only_runner_does_not_suppress_later_full_load(monkeypatch):
     )
 
     assert calls == [False, True]
+
+
+@pytest.mark.parametrize("failed", [False, True])
+def test_task_execution_times_are_written_to_result(monkeypatch, tmp_path, failed):
+    clock = Mock()
+    clock.time.return_value = 1000.25
+    monkeypatch.setattr("vectordb_bench.interface.time", clock)
+    monkeypatch.setattr(config, "RESULTS_LOCAL_DIR", tmp_path)
+    monkeypatch.setattr(TestResult, "display", lambda self: None)
+
+    def fake_run(self, drop_old=True):
+        clock.time.return_value = 1010.75
+        if failed:
+            raise RuntimeError("case failed")
+        return Metric()
+
+    monkeypatch.setattr(CaseRunner, "run", fake_run)
+    BenchMarkRunner()._async_task_v2(
+        TaskRunner(run_id="timed-run", task_label="timed-task", case_runners=[make_runner()]),
+        Mock(),
+    )
+
+    result_files = list(tmp_path.rglob("result_*.json"))
+    assert len(result_files) == 1
+    result = TestResult.read_file(result_files[0])
+    assert result.start_time == 1000.25
+    assert result.end_time == 1010.75
+    assert result.results[0].label.value == ("x" if failed else ":)")

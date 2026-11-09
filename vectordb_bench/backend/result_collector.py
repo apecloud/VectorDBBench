@@ -46,6 +46,10 @@ class ResultCollector:
             # opt into DB grouping so one backend owns one consolidated result file.
             if key in results_d:
                 results_d[key].results.extend(file_result.results)
+                for field, aggregate in (("start_time", min), ("end_time", max)):
+                    values = [getattr(results_d[key], field), getattr(file_result, field)]
+                    known_values = [value for value in values if value is not None]
+                    setattr(results_d[key], field, aggregate(known_values) if known_values else None)
             else:
                 results_d[key] = file_result
 
@@ -74,6 +78,8 @@ class ResultCollector:
                 task_label=task_label,
                 results=result.results,
                 timestamp=result.timestamp,
+                start_time=result.start_time,
+                end_time=result.end_time,
             )
             file_name = merged.file_fmt.format(date.today().strftime("%Y%m%d"), task_label, db_lower)
             output_file = result_dir.joinpath(db, file_name)

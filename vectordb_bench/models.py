@@ -407,6 +407,9 @@ class TestResult(BaseModel):
 
     file_fmt: str = "result_{}_{}_{}.json"  # result_20230718_statndard_milvus.json
     timestamp: float = 0.0
+    # Unix seconds spanning case execution; None for historical results.
+    start_time: float | None = None
+    end_time: float | None = None
     sensitive_output_fields: ClassVar[set[str]] = {"api_key", "password", "token"}
 
     @classmethod
@@ -482,6 +485,8 @@ class TestResult(BaseModel):
                     task_label=self.task_label,
                     results=result,
                     timestamp=timestamp,
+                    start_time=self.start_time,
+                    end_time=self.end_time,
                 ),
                 db=db.value.lower(),
             )

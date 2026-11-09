@@ -2,6 +2,7 @@ import concurrent.futures
 import logging
 import multiprocessing as mp
 import pathlib
+import time
 import traceback
 import uuid
 from enum import Enum
@@ -167,6 +168,7 @@ class BenchMarkRunner:
             if not running_task:
                 return
 
+            start_time = time.time()
             c_results = []
             latest_loaded_reuse_key, cached_load_duration = None, None
             for idx, runner in enumerate(running_task.case_runners):
@@ -219,6 +221,8 @@ class BenchMarkRunner:
                 run_id=running_task.run_id,
                 task_label=running_task.task_label,
                 results=c_results,
+                start_time=start_time,
+                end_time=time.time(),
             )
             test_result.display()
             test_result.flush()

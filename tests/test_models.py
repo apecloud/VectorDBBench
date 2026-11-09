@@ -9,11 +9,29 @@ from vectordb_bench import config
 from vectordb_bench.backend.clients import DB, IndexType
 from vectordb_bench.backend.clients.api import EmptyDBCaseConfig
 from vectordb_bench.backend.payload import PayloadProfile
+from vectordb_bench.backend.result_collector import ResultCollector
 from vectordb_bench.models import CaseConfig, CaseResult, CaseType, Metric, TaskConfig, TestResult
 from vectordb_bench.restful.format_res import format_results
 from vectordb_bench.results import getLeaderboardDataV2
 
 log = logging.getLogger("vectordb_bench")
+
+
+def test_merged_results_preserve_execution_time_range(tmp_path: Path):
+    for idx, (start, end) in enumerate(((1000.25, 1010.75), (900.5, 1020.5))):
+        result = _large_topk_test_result(Metric())
+        result.run_id = f"run-{idx}"
+        result.start_time = start
+        result.end_time = end
+        (tmp_path / f"result_{idx}.json").write_text(json.dumps(result.model_dump_for_output()))
+
+    output_files = ResultCollector.merge_by_db(tmp_path)
+
+    assert len(output_files) == 1
+    merged = TestResult.read_file(output_files[0])
+    assert len(merged.results) == 2
+    assert merged.start_time == 900.5
+    assert merged.end_time == 1020.5
 
 
 def test_performance_case_config_applies_top_level_payload_without_mutating_custom_case():
@@ -110,6 +128,8 @@ class TestModels:
 def test_old_result_defaults_large_topk_metrics(tmp_path: Path):
     test_result = _large_topk_test_result(Metric())
     payload = test_result.model_dump_for_output()
+    payload.pop("start_time", None)
+    payload.pop("end_time", None)
     case_config = payload["results"][0]["task_config"]["case_config"]
     metrics = payload["results"][0]["metrics"]
     case_config.pop("payload_profile", None)
@@ -123,6 +143,8 @@ def test_old_result_defaults_large_topk_metrics(tmp_path: Path):
 
     loaded = TestResult.read_file(result_file)
 
+    assert loaded.start_time is None
+    assert loaded.end_time is None
     assert loaded.results[0].task_config.case_config.payload_profile is None
     assert loaded.results[0].task_config.case_config.case.payload_profile == PayloadProfile.IDS_ONLY
     assert loaded.results[0].metrics.serial_latency_p50 == 0

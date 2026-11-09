@@ -138,7 +138,7 @@ class SerialSearchRunner:
     def __init__(
         self,
         db: api.VectorDB,
-        test_data: list,
+        test_data: np.ndarray | list,
         ground_truth: list[list[int]] | list[dict[str, int]],
         k: int = 100,
         filters: Filter = non_filter,
@@ -172,10 +172,11 @@ class SerialSearchRunner:
             msg = f"{self.db.name} does not support document payload_profile={self.payload_profile.value}"
             raise NotImplementedError(msg)
 
-        if isinstance(test_data[0], np.ndarray):
-            self.test_data = [query.tolist() for query in test_data]
-        else:
-            self.test_data = test_data
+        self.test_data = (
+            np.ascontiguousarray(test_data, dtype=np.float32)
+            if self.workload_kind == WorkloadKind.VECTOR
+            else test_data
+        )
         self.ground_truth = ground_truth
 
     def _search_embedding(self, emb: list[float], tenant: str | None = None) -> list[int]:
@@ -254,6 +255,8 @@ class SerialSearchRunner:
             recall_at_samples = {}
             tenant_rng = random.Random(0)
             for emb in test_data:
+                if isinstance(emb, np.ndarray):
+                    emb = emb.tolist()
                 tenant = (
                     self.tenant_labels[tenant_rng.randrange(len(self.tenant_labels))]
                     if self.workload_kind == WorkloadKind.VECTOR and self.tenant_labels

@@ -120,7 +120,7 @@ def test_hugging_face_source_can_feed_the_parquet_manager(
 
     monkeypatch.setattr(DatasetSource, "reader", lambda _source: Reader())
     assert manager.prepare(k=1)
-    assert manager.test_data == [[0.5, 0.25]]
+    assert manager.test_data.tolist() == [[0.5, 0.25]]
     assert [row.tolist() for row in manager.gt_data.iter_rows()] == [[0]]
     [batch] = list(manager.iter_batches(1))
     assert batch["id"].tolist() == [0]

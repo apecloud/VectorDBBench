@@ -269,6 +269,7 @@ class HuggingFaceReader(DatasetReader):
                         revision=revision,
                         cache_dir=local_ds_root,
                         allow_patterns=files,
+                        local_files_only=True,
                     )
                 )
             except Exception as exc:

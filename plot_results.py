@@ -4,7 +4,8 @@
 Usage: venv/bin/python plot_results.py [--results-dir results] [--output plot.html]
 Identical configurations keep the fastest run and its corresponding recall.
 Different datasets and metrics are plotted in separate panels.
-Top-k values share a panel; curves split by top-k, build parameters and RaBitQ bits.
+Top-k values share a panel; curves split by top-k, build parameters,
+force_merge_enabled and RaBitQ bits. Missing merge flags remain unspecified.
 """
 
 import argparse
@@ -82,6 +83,8 @@ def curve_label(point):
     if point["index"] == "IVF_RABITQ":
         bits = config.get("rbq_bits_query", "default")
         parameters.append(f"rbq_bits_query={bits}")
+    merge = config.get("force_merge_enabled", "unspecified")
+    parameters.append(f"force_merge_enabled={merge}")
     if parameters:
         return f"{point['index']} ({', '.join(parameters)})"
     return point["index"]
@@ -102,7 +105,7 @@ def plot_interactive(points, output):
         subplot_titles=[escape(f"{d} | {m}") for d, m in panel_names],
     )
     indices = sorted({curve_label(p) for p in points})
-    colors = {index: qualitative.Plotly[i % len(qualitative.Plotly)]
+    colors = {index: qualitative.Dark24[i % len(qualitative.Dark24)]
               for i, index in enumerate(indices)}
     shown = set()
     for col, panel in enumerate(panel_names, 1):
@@ -130,13 +133,16 @@ def plot_interactive(points, output):
                 ),
             ), row=1, col=col)
             shown.add(index)
-        fig.update_xaxes(title_text="Recall", tickformat=".1%", row=1, col=col)
-        fig.update_yaxes(title_text="Peak QPS", rangemode="tozero", row=1, col=col)
+        fig.update_xaxes(title_text="Recall", type="linear", tickformat=".1%",
+                         automargin=True, title_standoff=15, row=1, col=col)
+        fig.update_yaxes(title_text="Peak QPS", type="linear",
+                         automargin=True, row=1, col=col)
     fig.update_layout(
-        template="plotly_white", height=700, hovermode="closest",
-        title="Peak QPS vs Recall", margin={"t": 100, "b": 80},
+        template="plotly_white", height=850, hovermode="closest",
+        title="Peak QPS vs Recall", margin={"t": 100, "b": 240},
         legend={"title": {"text": "Index / top-k / build parameters (click to toggle)"},
-                "orientation": "h", "y": -0.2, "x": 0},
+                "orientation": "h", "y": -0.2, "yanchor": "top", "x": 0,
+                "maxheight": 0.25},
     )
     output.parent.mkdir(parents=True, exist_ok=True)
     # Embed Plotly so the resulting file also works offline.

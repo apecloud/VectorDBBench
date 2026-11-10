@@ -425,6 +425,7 @@ class Milvus(VectorDB):
                 log.debug("skip force merge compaction for gpu index type.")
             else:
                 try:
+                    self.client.release_collection(self.collection_name)
                     self._wait_for_compaction_ready()
                     compaction_id = self.client.compact(self.collection_name)
                     if compaction_id > 0:
@@ -443,6 +444,7 @@ class Milvus(VectorDB):
 
             # wait for index no matter what
             self._wait_for_index()
+            self.client.load_collection(self.collection_name)
             self.client.refresh_load(self.collection_name)
         except Exception as e:
             log.warning(f"{self.name} optimize error: {e}")

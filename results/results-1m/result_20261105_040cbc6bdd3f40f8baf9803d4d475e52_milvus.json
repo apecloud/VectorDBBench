@@ -1,0 +1,170 @@
+{
+  "run_id": "040cbc6bdd3f40f8baf9803d4d475e52",
+  "task_label": "040cbc6bdd3f40f8baf9803d4d475e52",
+  "results": [
+    {
+      "metrics": {
+        "max_load_count": 0,
+        "insert_duration": 168.7643,
+        "optimize_duration": 331.4275,
+        "load_duration": 500.1917,
+        "qps": 2693.008,
+        "serial_latency_p99": 0.0151,
+        "serial_latency_p95": 0.0144,
+        "serial_latency_p50": 0.0132,
+        "recall": 0.8697,
+        "recall_at": {
+          "100": 0.8697
+        },
+        "ndcg": 0.8929,
+        "mrr": 0.0,
+        "conc_num_list": [
+          8,
+          16,
+          50,
+          80
+        ],
+        "conc_qps_list": [
+          601.7542,
+          1153.1915,
+          2498.9896,
+          2693.008
+        ],
+        "conc_latency_p99_list": [
+          0.015237211759667848,
+          0.01634023881993016,
+          0.03322913000001786,
+          0.049323008039878005
+        ],
+        "conc_latency_p95_list": [
+          0.01448476040004607,
+          0.015322845999935452,
+          0.027190892000135136,
+          0.04197737145009341
+        ],
+        "conc_latency_p50_list": [
+          0.013141089999862743,
+          0.01367592099995818,
+          0.018810062500051572,
+          0.028713878999951703
+        ],
+        "conc_latency_avg_list": [
+          0.013230162684550326,
+          0.013801360441113901,
+          0.019887846925829816,
+          0.029479081575707534
+        ],
+        "payload_profile": "ids_only",
+        "payload_estimated_bytes_per_query": 2000,
+        "inserted_count": 1000000,
+        "insert_rows_per_second": 0.0,
+        "insert_completion_seconds": 0.0,
+        "searchable_after_insert_seconds": 0.0,
+        "indexed_after_searchable_seconds": 0.0,
+        "additional_parameters": {
+          "insert_batch_size": 100,
+          "load_concurrency": 8,
+          "ground_truth": {
+            "file": "neighbors.parquet",
+            "query_count": 10000,
+            "width": 100
+          }
+        },
+        "st_ideal_insert_duration": 0,
+        "st_search_stage_list": [],
+        "st_search_time_list": [],
+        "st_max_qps_list_list": [],
+        "st_recall_list": [],
+        "st_ndcg_list": [],
+        "st_serial_latency_p99_list": [],
+        "st_serial_latency_p95_list": [],
+        "st_conc_failed_rate_list": [],
+        "st_conc_num_list_list": [],
+        "st_conc_qps_list_list": [],
+        "st_conc_latency_p99_list_list": [],
+        "st_conc_latency_p95_list_list": [],
+        "st_conc_latency_avg_list_list": []
+      },
+      "task_config": {
+        "db": "Milvus",
+        "db_config": {
+          "db_label": "milvus",
+          "version": "",
+          "note": "",
+          "uri": "**********",
+          "user": "root",
+          "password": "**********",
+          "num_shards": 3,
+          "replica_number": 1,
+          "collection_name": "multimodal_embedding_1m"
+        },
+        "db_case_config": {
+          "index": "IVF_RABITQ",
+          "metric_type": "IP",
+          "use_partition_key": false,
+          "force_merge_enabled": true,
+          "force_merge_target_size_mb": null,
+          "nlist": 128,
+          "nprobe": 8,
+          "rbq_bits_query": 0,
+          "refine": false,
+          "refine_type": "SQ8",
+          "refine_k": 1.0
+        },
+        "case_config": {
+          "case_id": 501,
+          "custom_case": {
+            "dataset_name": "multimodal-embedding-1m"
+          },
+          "payload_profile": "ids_only",
+          "k": 100,
+          "nq": 1,
+          "concurrency_search_config": {
+            "num_concurrency": [
+              8,
+              16,
+              50,
+              80
+            ],
+            "concurrency_duration": 30,
+            "concurrency_timeout": 3600,
+            "serial_cooldown": 0.0
+          }
+        },
+        "stages": [
+          "drop_old",
+          "load",
+          "search_serial",
+          "search_concurrent"
+        ],
+        "load_concurrency": 8,
+        "insert_batch_size": 100
+      },
+      "label": ":)",
+      "dataset_metadata": {
+        "name": "multimodal-embedding-1m",
+        "distribution": null,
+        "source": "HuggingFace",
+        "repository": "VDBBench\/multimodal-embedding-1M",
+        "filename": null,
+        "revision": "4a13d5b19c13121c5201f5d4cd8877c082ef6a0c",
+        "source_distance": null,
+        "metric_type": "IP",
+        "point_type": "float32",
+        "normalization": "l2",
+        "model": "Qwen3-VL-Embedding-8B",
+        "family": "VDBBench",
+        "storage_format": "parquet",
+        "train_files": [
+          "train.parquet"
+        ],
+        "query_files": [
+          "test.parquet"
+        ],
+        "ground_truth_file": "neighbors.parquet"
+      }
+    }
+  ],
+  "file_fmt": "result_{}_{}_{}.json",
+  "timestamp": 1793808000.0
+}

@@ -1,0 +1,103 @@
+{
+  "run_id": "85d62fba06c14817b86bc32805bd3c61",
+  "task_label": "85d62fba06c14817b86bc32805bd3c61",
+  "results": [
+    {
+      "metrics": {
+        "max_load_count": 0,
+        "insert_duration": 0.0,
+        "optimize_duration": 0.0,
+        "load_duration": 0.0,
+        "qps": 0.0,
+        "serial_latency_p99": 0.0,
+        "serial_latency_p95": 0.0,
+        "serial_latency_p50": 0.0,
+        "recall": 0.0,
+        "recall_at": {},
+        "ndcg": 0.0,
+        "mrr": 0.0,
+        "conc_num_list": [],
+        "conc_qps_list": [],
+        "conc_latency_p99_list": [],
+        "conc_latency_p95_list": [],
+        "conc_latency_p50_list": [],
+        "conc_latency_avg_list": [],
+        "payload_profile": "ids_only",
+        "payload_estimated_bytes_per_query": 0,
+        "inserted_count": 0,
+        "insert_rows_per_second": 0.0,
+        "insert_completion_seconds": 0.0,
+        "searchable_after_insert_seconds": 0.0,
+        "indexed_after_searchable_seconds": 0.0,
+        "additional_parameters": {},
+        "st_ideal_insert_duration": 0,
+        "st_search_stage_list": [],
+        "st_search_time_list": [],
+        "st_max_qps_list_list": [],
+        "st_recall_list": [],
+        "st_ndcg_list": [],
+        "st_serial_latency_p99_list": [],
+        "st_serial_latency_p95_list": [],
+        "st_conc_failed_rate_list": [],
+        "st_conc_num_list_list": [],
+        "st_conc_qps_list_list": [],
+        "st_conc_latency_p99_list_list": [],
+        "st_conc_latency_p95_list_list": [],
+        "st_conc_latency_avg_list_list": []
+      },
+      "task_config": {
+        "db": "Milvus",
+        "db_config": {
+          "db_label": "milvus",
+          "version": "",
+          "note": "",
+          "uri": "**********",
+          "user": "root",
+          "password": "**********",
+          "num_shards": 1,
+          "replica_number": 1,
+          "collection_name": "multimodal_embedding_1m"
+        },
+        "db_case_config": {
+          "index": "HNSW",
+          "metric_type": "IP",
+          "use_partition_key": false,
+          "M": 8,
+          "efConstruction": 128,
+          "ef": 10
+        },
+        "case_config": {
+          "case_id": 501,
+          "custom_case": {
+            "dataset_name": "multimodal-embedding-1m"
+          },
+          "payload_profile": "ids_only",
+          "k": 10,
+          "concurrency_search_config": {
+            "num_concurrency": [
+              1,
+              8,
+              16,
+              50
+            ],
+            "concurrency_duration": 30,
+            "concurrency_timeout": 3600,
+            "serial_cooldown": 0.0
+          }
+        },
+        "stages": [
+          "drop_old",
+          "load",
+          "search_serial",
+          "search_concurrent"
+        ],
+        "load_concurrency": 0,
+        "insert_batch_size": 100
+      },
+      "label": "x",
+      "dataset_metadata": null
+    }
+  ],
+  "file_fmt": "result_{}_{}_{}.json",
+  "timestamp": 1793721600.0
+}

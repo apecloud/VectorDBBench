@@ -1,0 +1,156 @@
+{
+  "run_id": "da63b6cf46ab45f3ab89b7be7e727580",
+  "task_label": "da63b6cf46ab45f3ab89b7be7e727580",
+  "results": [
+    {
+      "metrics": {
+        "max_load_count": 0,
+        "insert_duration": 0.0,
+        "optimize_duration": 0.0,
+        "load_duration": 0.0,
+        "qps": 4673.4022,
+        "serial_latency_p99": 0.0028,
+        "serial_latency_p95": 0.0026,
+        "serial_latency_p50": 0.0023,
+        "recall": 0.9945,
+        "recall_at": {},
+        "ndcg": 0.9947,
+        "mrr": 0.0,
+        "conc_num_list": [
+          1,
+          8,
+          16,
+          50
+        ],
+        "conc_qps_list": [
+          460.6089,
+          2391.647,
+          3389.0767,
+          4673.4022
+        ],
+        "conc_latency_p99_list": [
+          0.0026530623300459405,
+          0.00480241375999867,
+          0.007801377699843215,
+          0.01697619871997629
+        ],
+        "conc_latency_p95_list": [
+          0.002432747800025936,
+          0.004277470599890876,
+          0.0067040092499155435,
+          0.014383259199985331
+        ],
+        "conc_latency_p50_list": [
+          0.002122902999872167,
+          0.003252147000239347,
+          0.004523143999904278,
+          0.010098625999944488
+        ],
+        "conc_latency_avg_list": [
+          0.002162868104458462,
+          0.0033294119078383254,
+          0.004689450988075912,
+          0.010524024566957757
+        ],
+        "payload_profile": "ids_only",
+        "payload_estimated_bytes_per_query": 200,
+        "inserted_count": 0,
+        "insert_rows_per_second": 0.0,
+        "insert_completion_seconds": 0.0,
+        "searchable_after_insert_seconds": 0.0,
+        "indexed_after_searchable_seconds": 0.0,
+        "additional_parameters": {
+          "ground_truth": {
+            "file": "neighbors.parquet",
+            "query_count": 10000,
+            "width": 100
+          }
+        },
+        "st_ideal_insert_duration": 0,
+        "st_search_stage_list": [],
+        "st_search_time_list": [],
+        "st_max_qps_list_list": [],
+        "st_recall_list": [],
+        "st_ndcg_list": [],
+        "st_serial_latency_p99_list": [],
+        "st_serial_latency_p95_list": [],
+        "st_conc_failed_rate_list": [],
+        "st_conc_num_list_list": [],
+        "st_conc_qps_list_list": [],
+        "st_conc_latency_p99_list_list": [],
+        "st_conc_latency_p95_list_list": [],
+        "st_conc_latency_avg_list_list": []
+      },
+      "task_config": {
+        "db": "Milvus",
+        "db_config": {
+          "db_label": "milvus",
+          "version": "",
+          "note": "",
+          "uri": "**********",
+          "user": "root",
+          "password": "**********",
+          "num_shards": 1,
+          "replica_number": 1,
+          "collection_name": "multimodal_embedding_1m"
+        },
+        "db_case_config": {
+          "index": "HNSW",
+          "metric_type": "IP",
+          "use_partition_key": false,
+          "M": 8,
+          "efConstruction": 128,
+          "ef": 100
+        },
+        "case_config": {
+          "case_id": 501,
+          "custom_case": {
+            "dataset_name": "multimodal-embedding-1m"
+          },
+          "payload_profile": "ids_only",
+          "k": 10,
+          "concurrency_search_config": {
+            "num_concurrency": [
+              1,
+              8,
+              16,
+              50
+            ],
+            "concurrency_duration": 30,
+            "concurrency_timeout": 3600,
+            "serial_cooldown": 0.0
+          }
+        },
+        "stages": [
+          "search_serial",
+          "search_concurrent"
+        ],
+        "load_concurrency": 0,
+        "insert_batch_size": 100
+      },
+      "label": ":)",
+      "dataset_metadata": {
+        "name": "multimodal-embedding-1m",
+        "distribution": null,
+        "source": "HuggingFace",
+        "repository": "VDBBench\/multimodal-embedding-1M",
+        "filename": null,
+        "revision": "4a13d5b19c13121c5201f5d4cd8877c082ef6a0c",
+        "source_distance": null,
+        "metric_type": "IP",
+        "point_type": "float32",
+        "normalization": "l2",
+        "model": "Qwen3-VL-Embedding-8B",
+        "family": "VDBBench",
+        "storage_format": "parquet",
+        "train_files": [],
+        "query_files": [
+          "test.parquet"
+        ],
+        "ground_truth_file": "neighbors.parquet"
+      }
+    }
+  ],
+  "file_fmt": "result_{}_{}_{}.json",
+  "timestamp": 1793721600.0
+}
